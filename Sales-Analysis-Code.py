@@ -38,7 +38,7 @@ if uploaded_file is not None:
             "Most Popular Products",
             "Organic Coffee Analysis",
             "Eco_Friendly_cup Analysis",
-            "Price vs Quantity (Line Plot)",  # Changed from Scatter Plot to Line Plot
+            "Price vs Quantity (Line Plot)",
             "Price Distribution (Histogram)"
         ]
     )
@@ -86,19 +86,16 @@ if uploaded_file is not None:
             st.plotly_chart(fig)
         else:
             st.error("❌ 'Eco_Friendly_cup' column is missing in the uploaded file.")
-    
+
     # 5. Price vs Quantity (Line Plot)
     if analysis_type == "Price vs Quantity (Line Plot)":
         if 'Unit_price' in data.columns and 'Transaction_qty' in data.columns:
             st.subheader("📈 Price vs Quantity Line Plot")
 
-            # Group by unit price and calculate the mean quantity for each price
             grouped_data = data.groupby('Unit_price')['Transaction_qty'].mean().reset_index()
-            # Sort by unit price for a proper line plot
             grouped_data = grouped_data.sort_values('Unit_price')
 
             fig, ax = plt.subplots(figsize=(10, 6))
-            # Create line plot
             ax.plot(grouped_data['Unit_price'], grouped_data['Transaction_qty'],
                     marker='o', linestyle='-', color='green', linewidth=2)
 
@@ -129,6 +126,16 @@ The line plot shows the relationship between **Unit Price** and **Average Transa
             ax.set_ylabel("Frequency")
             ax.set_title("Distribution of Unit Prices")
             st.pyplot(fig)
+
+            # 🔍 Brief Analysis
+            st.markdown("### 🔍 Brief Analysis")
+            st.markdown("""
+The histogram shows how frequently different **Unit Prices** occur in the dataset.
+
+- Most of the unit prices seem to be concentrated in the lower price range (around 2.0 to 4.0).
+- There may be a few products with significantly higher prices, but they occur less frequently.
+- This suggests that the pricing strategy is focused on affordable products, with a few premium options.
+""")
         else:
             st.error("❌ 'Unit_price' column is missing in the uploaded file.")
 
@@ -146,3 +153,10 @@ The line plot shows the relationship between **Unit Price** and **Average Transa
             st.error("❌ Columns 'Transaction_qty', 'Unit_price', or 'Product_type' are missing in the uploaded file.")
 else:
     st.info("📂 Please upload a data file to begin analysis.")
+
+
+    
+   
+          
+          
+          
