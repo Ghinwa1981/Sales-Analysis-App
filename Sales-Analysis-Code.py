@@ -88,7 +88,7 @@ if uploaded_file is not None:
             st.error("❌ 'Eco_Friendly_cup' column is missing in the uploaded file.")
 
     # 5. Price vs Quantity (Line Plot)
-    if analysis_type == "Price vs Quantity (Line Plot)":
+    elif analysis_type == "Price vs Quantity (Line Plot)":
         if 'Unit_price' in data.columns and 'Transaction_qty' in data.columns:
             st.subheader("📈 Price vs Quantity Line Plot")
 
@@ -104,19 +104,30 @@ if uploaded_file is not None:
             ax.set_title("Unit Price vs Quantity Sold")
             st.pyplot(fig)
 
-            # 🔍 Brief Analysis
-            st.markdown("### 🔍 Brief Analysis")
-            st.markdown("""
-The line plot shows the relationship between **Unit Price** and **Average Transaction Quantity**.
+            # Dynamic brief analysis
+            max_qty = grouped_data['Transaction_qty'].max()
+            max_price = grouped_data[grouped_data['Transaction_qty'] == max_qty]['Unit_price'].values[0]
 
-- In the lower price range (around 2.0 to 2.5), the quantity sold fluctuates.
-- A significant drop is observed near **2.6**, followed by a rise reaching a peak around **4.0**.
-- After this peak, there's a noticeable decline in quantity sold as the price increases further.
-""")
+            min_qty = grouped_data['Transaction_qty'].min()
+            min_price = grouped_data[grouped_data['Transaction_qty'] == min_qty]['Unit_price'].values[0]
+
+            st.markdown("### 🔍 Brief Analysis")
+            st.markdown(f"""
+            - The **highest average quantity sold** was **{max_qty:.2f}** at a unit price of **${max_price:.2f}**.
+            - The **lowest average quantity sold** was **{min_qty:.2f}** at a unit price of **${min_price:.2f}**.
+            """)
+
+            # Optional: Trend description
+            if grouped_data['Transaction_qty'].iloc[-1] < grouped_data['Transaction_qty'].iloc[0]:
+                trend = "a decreasing trend in quantity sold as price increases"
+            else:
+                trend = "an increasing trend in quantity sold as price increases"
+
+            st.markdown(f"- Overall, there is **{trend}**.")
         else:
             st.error("❌ 'Unit_price' and/or 'Transaction_qty' columns are missing in the uploaded file.")
 
-    # 6. Histogram: Price Distribution
+    # 6. Price Distribution (Histogram)
     elif analysis_type == "Price Distribution (Histogram)":
         if 'Unit_price' in data.columns:
             st.subheader("📊 Price Distribution Histogram")
@@ -127,19 +138,28 @@ The line plot shows the relationship between **Unit Price** and **Average Transa
             ax.set_title("Distribution of Unit Prices")
             st.pyplot(fig)
 
-            # 🔍 Brief Analysis
-            st.markdown("### 🔍 Brief Analysis")
-            st.markdown("""
-The histogram shows how frequently different **Unit Prices** occur in the dataset.
+            # Dynamic analysis
+            mean_price = data['Unit_price'].mean()
+            median_price = data['Unit_price'].median()
+            mode_price = data['Unit_price'].mode()[0]
+            max_price = data['Unit_price'].max()
+            min_price = data['Unit_price'].min()
 
-- Most of the unit prices seem to be concentrated in the lower price range (around 2.0 to 4.0).
-- There may be a few products with significantly higher prices, but they occur less frequently.
-- This suggests that the pricing strategy is focused on affordable products, with a few premium options.
-""")
+            st.markdown("### 🔍 Brief Analysis")
+            st.markdown(f"""
+            - The **average (mean)** unit price is **${mean_price:.2f}**.
+            - The **median** unit price is **${median_price:.2f}**, and the **most frequent (mode)** price is **${mode_price:.2f}**.
+            - Prices range from **${min_price:.2f}** to **${max_price:.2f}**.
+            """)
+
+            if mean_price > median_price:
+                st.markdown("- The price distribution is **right-skewed**, indicating higher-priced outliers.")
+            else:
+                st.markdown("- The price distribution is **left-skewed** or fairly symmetric.")
         else:
             st.error("❌ 'Unit_price' column is missing in the uploaded file.")
 
-    # 7. Revenue Calculation
+    # 7. Revenue Calculation (Optional Checkbox)
     if st.sidebar.checkbox("💰 Calculate Revenue"):
         if 'Transaction_qty' in data.columns and 'Unit_price' in data.columns and 'Product_type' in data.columns:
             data['Revenue'] = data['Transaction_qty'] * data['Unit_price']
@@ -154,9 +174,10 @@ The histogram shows how frequently different **Unit Prices** occur in the datase
 else:
     st.info("📂 Please upload a data file to begin analysis.")
 
-
-    
    
+   
+      
+         
           
           
           
